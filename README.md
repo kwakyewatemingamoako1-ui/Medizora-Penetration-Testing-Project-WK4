@@ -28,7 +28,7 @@ Across the assessment, seven vulnerabilities were identified, scaling from Mediu
 
 <br>
 
-## 📌 Project Objectives
+## 💡 Objectives
 
 
 * **External Assessment:** Evaluate the web application's security posture from an unauthenticated, black-box perspective.
