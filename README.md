@@ -46,3 +46,33 @@ Testing was conducted strictly under written authorization from the client as pa
 | :--- | :--- |
 | ✅ **In-Scope** | • Public-facing web application behavior<br>• Patient portal and all discovered web paths within `https://medirozahospital.com` |
 | ❌ **Out-of-Scope**| • Social engineering attacks against staff or users<br>• Denial of Service (DoS) or stress testing<br>• Any domains, systems, or IP addresses not explicitly agreed upon |
+
+<br>
+
+## ⚙️ Assessment Methodology
+ 
+ 
+The evaluation followed a phased, structured black-box approach to ensure comprehensive coverage and safe execution:
+
+* **Reconnaissance:** Performed initial intelligence gathering and surface mapping using open-source tools and public-facing endpoints.
+
+* **Vulnerability Discovery:** Analyzed application logic, input fields, and authentication workflows to identify potential security gaps.
+
+* **Controlled Exploitation:** Safely verified the operational impact of each flaw within the authorized testing boundaries without causing disruption.
+  
+* **Reporting & Remediation:** Documented technical evidence, step-by-step reproduction paths, and prioritized defensive hardening recommendations.
+
+<br>
+
+## 🧰 Tools Used
+
+| Tool | Purpose in the Assessment |
+| :--- | :--- |
+| **cURL** | Sending HTTP requests and reviewing web-server responses |
+| **Browser Developer Tools** | Inspecting page source and login-form behavior |
+| **Burp Suite** | Intercepting, analyzing, and modifying HTTP request traffic during login and input testing |
+| **Networkwalks Hash Calculator** | Extracting PDF password hashes |
+| **Networkwalks Password Cracker** | Testing PDF password hashes against wordlists |
+| **QPDF** | Decrypting password-protected PDFs after password recovery |
+| **ExifTool** | Reading hidden metadata from PDFs |
+| **ChatGPT** | Converting raw SQL data into readable tables during analysis |
