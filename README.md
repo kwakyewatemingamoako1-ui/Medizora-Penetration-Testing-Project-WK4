@@ -234,3 +234,33 @@ The penetration test against `medirozahospital.com` highlighted several critical
 * **Backup Management:** Backups must never be placed in publicly accessible web directories.
 
 * **Defense in Depth:** Defense in depth is essential: secure input handling, authorization, file storage, server configuration, and data governance must all work together.
+
+<br>
+
+# 🏁 Conclusion
+
+This assessment successfully demonstrated an end-to-end attack path from the initial login interface to highly sensitive internal data, driven entirely by common and preventable flaws. It is strongly recommended that all Critical and High-risk findings be remediated immediately prior to deploying the system for live patient data or production use.
+
+<br>
+
+# ⚖️ Disclaimer
+
+This report was produced as part of a controlled educational security assessment by Networkwalks. All testing was performed within authorized parameters and adhered strictly to the agreed-upon scope. The techniques and methodologies described in this document are intended strictly for defensive awareness and must never be executed against any system without prior, explicit written authorization from the legal owner.
+
+<br>
+
+# 👤 Credits
+
+* **Author:** Kwakyewa Teming-Amoako
+* **Cybersecurity Mentor:** Waqas Karim, CCIE
+* **Organization:** Networkwalks
+* **Program:** B083 Cybersecurity Internship – Week 4 Capstone Project
+
+<br>
+
+<p align="center">
+  <img alt="For educational and authorized testing only" src="https://img.shields.io/badge/FOR%20EDUCATIONAL%20AND%20AUTHORIZED%20TESTING%20ONLY-0b1026?style=for-the-badge">
+</p>
+
+<!-- FOOTER -->
+<img width="100%" src="https://capsule-render.vercel.app/api?type=rounded&color=0:111827,45:374151,100:991b1b&height=120&section=footer&text=Networkwalks%20B083%20%7C%20Week%204%20Capstone&fontSize=20&fontColor=fca5a5&fontAlignY=50&stroke=000000" alt="Mediroza Security Assessment Footer">
