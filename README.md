@@ -76,3 +76,28 @@ The evaluation followed a phased, structured black-box approach to ensure compre
 | **QPDF** | Decrypting password-protected PDFs after password recovery |
 | **ExifTool** | Reading hidden metadata from PDFs |
 | **ChatGPT** | Converting raw SQL data into readable tables during analysis |
+
+<br>
+
+## 📋 Executive Summary
+
+Overall, the application demonstrated a critically weak security posture. A sequence of minor oversights allowed an external, unauthenticated attacker to chain vulnerabilities together—moving from initial surface mapping all the way to patient files and an exposed database backup.
+
+The recovered database contained confidential records for 30 hospital employees and 10 shareholders. All personal and financial data has been strictly redacted from this repository to ensure privacy.
+
+Immediate patch management and configuration hardening are urgently required for all identified Critical and High-risk issues.
+
+<br>
+
+## 📊 Summary of Findings
+
+| Ref # | Vulnerability Description | Target Location | Severity |
+| :--- | :--- | :--- | :--- |
+| **Vuln-01** | Username enumeration via differential login responses | `patient/login.php` | 🟡 **Medium** |
+| **Vuln-02** | SQL injection authentication bypass | `patient/login.php` | 🔴 **Critical** |
+| **Vuln-03** | Authorized access to encrypted patient PDFs | `patient/reports/` | 🟠 **High** |
+| **Vuln-04** | Weak user passwords protecting confidential PDFs | `patient_report_*.pdf` | 🟠 **High** |
+| **Vuln-05** | Internal developer notes leaked in PDF metadata | `patient_report_3.pdf` | 🟡 **Medium** |
+| **Vuln-06** | Exposed legacy backup folder with directory indexing | `/old/` | 🔴 **Critical** |
+| **Vuln-07** | Plaintext employee payroll and corporate shareholder data | `/old/mediroza_db_backup_2019.sql` | 🔴 **Critical** |
+
