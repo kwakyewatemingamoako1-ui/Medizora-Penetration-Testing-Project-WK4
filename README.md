@@ -91,13 +91,73 @@ Immediate patch management and configuration hardening are urgently required for
 
 ## 📊 Summary of Findings
 
-| Ref # | Vulnerability Description | Target Location | Severity |
-| :--- | :--- | :--- | :--- |
+| Ref | Vulnerability Description | Target Location | Severity |
+| --- | --- | --- | --- |
 | **Vuln-01** | Username enumeration via differential login responses | `patient/login.php` | 🟡 **Medium** |
 | **Vuln-02** | SQL injection authentication bypass | `patient/login.php` | 🔴 **Critical** |
-| **Vuln-03** | Authorized access to encrypted patient PDFs | `patient/reports/` | 🟠 **High** |
+| **Vuln-03** | Unauthorized access to encrypted patient PDFs | `patient/reports/` | 🟠 **High** |
 | **Vuln-04** | Weak user passwords protecting confidential PDFs | `patient_report_*.pdf` | 🟠 **High** |
-| **Vuln-05** | Internal developer notes leaked in PDF metadata | `patient_report_3.pdf` | 🟡 **Medium** |
+| **Vuln-05** | Directory enumeration & sensitive endpoint exposure via automated tooling revealing hidden admin panels and configuration files | `/` (Root domain) | 🟡 **Medium** |
 | **Vuln-06** | Exposed legacy backup folder with directory indexing | `/old/` | 🔴 **Critical** |
 | **Vuln-07** | Plaintext employee payroll and corporate shareholder data | `/old/mediroza_db_backup_2019.sql` | 🔴 **Critical** |
+
+Let me know when you are ready to write out the detailed subsections or if you need any code snippets generated for your evidence screenshots!
+
+<br>
+
+## The Attack Chain
+
+### 1. Reconnaissance:
+Mapped the target surface using footprinting utilities including `WHOIS`, `nslookup`, `curl -I`, `wafw00f`, `dnsrecon` and `Nmap`. An inspection of `robots.txt` subsequently disclosed restricted server paths (`/patient/`, `/staff/`, and `/old/`), providing a clear roadmap for the assessment.
+
+### 2. Username enumeration via differential login responses:
+The login page leaked account validity by returning distinct error messages for invalid usernames versus incorrect passwords, confirming a valid administrative user account.
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/b2b73cd6-96df-4753-8243-058ef847b707" alt="Username Enumeration Proof" width="800" /><br>
+  <em>Differential error responses confirmed the existence of a valid administrative user account, streamlining subsequent attacks.</em>
+</p>
+
+
+### 3. SQL Injection Auth Bypass: 
+The patient portal login page (`/patient/login.php`) suffered from a severe SQL injection vulnerability. Inputting `admin'--` as the username alongside an empty password successfully manipulated the database query logic, returning an HTTP `302` redirect to `portal.php` and granting an authenticated session without credentials.
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/3ba6db84-d42f-4833-a881-2cf2d2179f2d" alt="Burp Suite SQL Injection Proof" width="850" /><br>
+  <em>The injected login request triggered an HTTP 302 Found response, successfully bypassing authentication.</em>
+</p>
+
+Once inside the portal, the application exposed three password-protected patient lab reports for download.
+
+### 4. Unauthorized access to encrypted patient PDFs
+Following the successful authentication bypass, the patient portal provided direct download access to three sensitive lab-report PDFs that should have been strictly restricted to authorized clinicians and their respective patients.
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/0a019352-3a13-4716-a695-059d081cba71" alt="Directory listing of /patient/reports/ showing downloadable PDFs" width="800" /><br>
+  <em>Directory listing of /patient/reports/ reveals three downloadable PDFs.</em>
+</p>
+
+### 5. Weak user passwords protecting confidential PDFs:
+Despite PDF encryption, the weak passwords used were easily compromised using standard wordlists; two reports were unlocked with a basic 100-word list, while the final file required John the Ripper's default dictionary, demonstrating that the applied protection offered negligible security for confidential medical records.
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/17827aa6-d6a9-4375-a848-445243043b3f" alt="PDF Password Cracking Proof" width="800" /><br>
+  <em>Cracking weak PDF passwords using standard wordlists to recover protected medical documents.</em>
+</p>
+
+### 6. Directory enumeration & sensitive endpoint exposure via automated tooling revealing hidden admin panels and configuration files:
+
+* **Exposed Administrative Directories**: Multiple user and system home directories (including `~admin/`, `~administrator/`, `~test/`, `~root/`, and `~sysadm/`) returned a `301 Moved Permanently` status code.
+
+
+* **Legacy Backup Directory**: An obsolete `old/` directory was uncovered with a `301` status, presenting a risk of housing unmaintained scripts or legacy files.
+
+
+* **Exposed Sensitive Files**: Critical application entry points—such as `robots.txt` and the `wp-admin` portal—were exposed with a `200` status, expanding the attack surface.
+
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/5acff773-3bf9-47a1-ae9f-5721667cee6e" alt="Screenshot_2026-09-29_13_25_33" width="800" /><br>
+  <img src="https://github.com/user-attachments/assets/c14b43fa-73d9-4a85-9c5f-a757000f0d72" alt="Screenshot_2026-09-29_13_26_14" width="800" /><br>
+  <em>Gobuster directory enumeration results revealing exposed user home directories, legacy backup paths, and sensitive administrative files.</em>
+</div>
 
