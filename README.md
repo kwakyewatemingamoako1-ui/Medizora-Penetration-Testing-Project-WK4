@@ -101,16 +101,14 @@ Immediate patch management and configuration hardening are urgently required for
 | **Vuln-06** | Exposed legacy backup folder with directory indexing | `/old/` | 🔴 **Critical** |
 | **Vuln-07** | Plaintext employee payroll and corporate shareholder data | `/old/mediroza_db_backup_2019.sql` | 🔴 **Critical** |
 
-Let me know when you are ready to write out the detailed subsections or if you need any code snippets generated for your evidence screenshots!
-
 <br>
 
 ## The Attack Chain
 
-### 1. Reconnaissance:
+### 0. Reconnaissance:
 Mapped the target surface using footprinting utilities including `WHOIS`, `nslookup`, `curl -I`, `wafw00f`, `dnsrecon` and `Nmap`. An inspection of `robots.txt` subsequently disclosed restricted server paths (`/patient/`, `/staff/`, and `/old/`), providing a clear roadmap for the assessment.
 
-### 2. Username enumeration via differential login responses:
+### 1. Username enumeration via differential login responses:
 The login page leaked account validity by returning distinct error messages for invalid usernames versus incorrect passwords, confirming a valid administrative user account.
 
 <p align="center">
@@ -119,7 +117,7 @@ The login page leaked account validity by returning distinct error messages for 
 </p>
 
 
-### 3. SQL Injection Auth Bypass: 
+### 2. SQL Injection Auth Bypass: 
 The patient portal login page (`/patient/login.php`) suffered from a severe SQL injection vulnerability. Inputting `admin'--` as the username alongside an empty password successfully manipulated the database query logic, returning an HTTP `302` redirect to `portal.php` and granting an authenticated session without credentials.
 
 <p align="center">
@@ -129,7 +127,7 @@ The patient portal login page (`/patient/login.php`) suffered from a severe SQL 
 
 Once inside the portal, the application exposed three password-protected patient lab reports for download.
 
-### 4. Unauthorized access to encrypted patient PDFs
+### 3. Unauthorized access to encrypted patient PDFs:
 Following the successful authentication bypass, the patient portal provided direct download access to three sensitive lab-report PDFs that should have been strictly restricted to authorized clinicians and their respective patients.
 
 <p align="center">
@@ -137,7 +135,7 @@ Following the successful authentication bypass, the patient portal provided dire
   <em>Directory listing of /patient/reports/ reveals three downloadable PDFs.</em>
 </p>
 
-### 5. Weak user passwords protecting confidential PDFs:
+### 4. Weak user passwords protecting confidential PDFs:
 Despite PDF encryption, the weak passwords used were easily compromised using standard wordlists; two reports were unlocked with a basic 100-word list, while the final file required John the Ripper's default dictionary, demonstrating that the applied protection offered negligible security for confidential medical records.
 
 <p align="center">
@@ -145,7 +143,7 @@ Despite PDF encryption, the weak passwords used were easily compromised using st
   <em>Cracking weak PDF passwords using standard wordlists to recover protected medical documents.</em>
 </p>
 
-### 6. Directory enumeration & sensitive endpoint exposure via automated tooling revealing hidden admin panels and configuration files:
+### 5. Directory enumeration & sensitive endpoint exposure via automated tooling revealing hidden admin panels and configuration files:
 
 * **Exposed Administrative Directories**: Multiple user and system home directories (including `~admin/`, `~administrator/`, `~test/`, `~root/`, and `~sysadm/`) returned a `301 Moved Permanently` status code.
 
@@ -161,3 +159,78 @@ Despite PDF encryption, the weak passwords used were easily compromised using st
   <em>Gobuster directory enumeration results revealing exposed user home directories, legacy backup paths, and sensitive administrative files.</em>
 </div>
 
+### 6. Exposed legacy backup folder with directory indexing: 
+During reconnaissance, review of the `robots.txt` file identified the `/old/` directory, the relevance of which was confirmed by prior metadata analysis. Because directory listing was enabled, a database backup file was exposed to unauthenticated users and successfully downloaded during the authorized test.
+
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/65bea792-1851-4c80-83a9-b48e02677230" alt="Screenshot_2026-09-28_19_58_35" width="800" /><br>
+  <em>The robots.txt file for medirozahospital.com revealing sensitive disallowed directories including /old/, /patient/, and /staff/. </em>
+</div>
+<br>
+
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/891d0d70-ccfc-43ad-9b94-caea3aabddd5" alt="Screenshot_2026-09-29_13_34_43" width="800" /><br>
+  <em>Additional evidence of the database backup and contents uncovered during the assessment.</em>
+</div>
+The recovered database backup comprised 30 employee records; detailing names, national identification numbers, and salaries, alongside the complete 10-entry shareholder register.
+
+### 7. Plaintext employee payroll and corporate shareholder data:
+The compromised database backup exposed unencrypted records for both employees and shareholders. Employee details featured names, positions, contact numbers, national identification numbers, and monthly compensation, while shareholder details listed names, ownership shares, and share categories. To protect privacy, this document outlines the extent of the exposure rather than displaying the raw, sensitive data.
+
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/8f88f549-ac40-4483-b2be-dd6596ae13f7" alt="Screenshot_2026-09-29_13_38_25" width="800" /><br>
+  <img src="https://github.com/user-attachments/assets/dbf0c748-0c36-41b3-abaa-707873e9923d" alt="Screenshot_2026-09-29_13_38_44" width="800" /><br>
+  <img src="https://github.com/user-attachments/assets/3eedb9ef-282f-4a86-a3ce-e0f79ef9f281" alt="Screenshot_2026-09-29_13_38_51" width="800" /><br>
+  <em>Evidence of the exposed database backup file and contents discovered within the legacy directory during the assessment.</em>
+</div>
+
+<br>
+
+# ⚔️ Attack Chain Walkthrough
+
+**1. Reconnaissance & Endpoint Exposure (`Vuln-05`)** 
+Automated tooling and initial analysis of the root domain (`/`) uncovered directory enumeration and exposed sensitive endpoints, including paths revealed via `robots.txt`.
+
+**2. Username Enumeration (`Vuln-01`)** 
+Inspecting the login interface at `patient/login.php`, differential error messages permitted successful username enumeration to identify valid accounts.
+
+**3. Authentication Bypass (`Vuln-02`)** 
+Leveraging vulnerable input handling on `patient/login.php`, a controlled SQL injection payload bypassed authentication controls entirely.
+
+**4. Portal Access (`Vuln-03`)** 
+Bypassing the login mechanism granted unauthorized access to restricted directories and files within `patient/reports/`.
+
+**5. Document Access (`Vuln-03`)** 
+Confidential patient lab-report PDFs were downloaded directly from the portal interface.
+
+**6. Credential Weakness (`Vuln-04`)** 
+Wordlist attacks easily defeated the weak user passwords protecting these confidential `patient_report_*.pdf` files.
+
+**7. Internal Footprinting** 📝
+Metadata extracted from the unlocked PDFs exposed an internal staff note pointing toward legacy structures.
+
+**8. Directory Indexing (`Vuln-06`)** 
+Investigation of the legacy endpoint revealed an exposed legacy backup folder with directory indexing enabled at `/old/`.
+
+**9. Critical Data Compromise (`Vuln-07`)** 
+Accessing `/old/mediroza_db_backup_2019.sql` directly exposed plaintext employee payroll details and corporate shareholder data.
+
+# Full Report
+
+<br>
+
+# 💡 Lessons Learned
+
+The penetration test against `medirozahospital.com` highlighted several critical takeaways for improving organizational security posture:
+
+* **Chained Vulnerabilities:** Small security flaws can combine into a high-impact attack chain.
+
+* **Information Disclosure:** Authentication errors and database errors reveal valuable information to attackers.
+
+* **Cryptographic Weakness:** Encryption is ineffective when document passwords are weak and easily guessed.
+
+* **Metadata Security:** Document metadata requires the same security review as visible content.
+
+* **Backup Management:** Backups must never be placed in publicly accessible web directories.
+
+* **Defense in Depth:** Defense in depth is essential: secure input handling, authorization, file storage, server configuration, and data governance must all work together.
