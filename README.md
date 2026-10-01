@@ -217,6 +217,7 @@ Investigation of the legacy endpoint revealed an exposed legacy backup folder wi
 Accessing `/old/mediroza_db_backup_2019.sql` directly exposed plaintext employee payroll details and corporate shareholder data.
 
 # Full Report
+[PENETRATION TESTING REPORT( Mediroza Hospital).pdf](https://github.com/user-attachments/files/32884901/PENETRATION.TESTING.REPORT.Mediroza.Hospital.pdf)
 
 <br>
 
