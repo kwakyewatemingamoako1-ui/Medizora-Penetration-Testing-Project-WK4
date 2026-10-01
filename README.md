@@ -69,13 +69,14 @@ The evaluation followed a phased, structured black-box approach to ensure compre
 | Tool | Purpose in the Assessment |
 | :--- | :--- |
 | **cURL** | Sending HTTP requests and reviewing web-server responses |
+| **Gobuster** | Automating directory and file enumeration to discover hidden server endpoints and paths |
 | **Browser Developer Tools** | Inspecting page source and login-form behavior |
 | **Burp Suite** | Intercepting, analyzing, and modifying HTTP request traffic during login and input testing |
 | **Networkwalks Hash Calculator** | Extracting PDF password hashes |
 | **Networkwalks Password Cracker** | Testing PDF password hashes against wordlists |
 | **QPDF** | Decrypting password-protected PDFs after password recovery |
 | **ExifTool** | Reading hidden metadata from PDFs |
-| **ChatGPT** | Converting raw SQL data into readable tables during analysis |
+| **Gemini** | Converting raw SQL data into readable tables during analysis |
 
 <br>
 
