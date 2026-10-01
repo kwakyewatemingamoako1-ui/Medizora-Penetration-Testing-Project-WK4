@@ -207,8 +207,8 @@ Confidential patient lab-report PDFs were downloaded directly from the portal in
 **6. Credential Weakness (`Vuln-04`)** 
 Wordlist attacks easily defeated the weak user passwords protecting these confidential `patient_report_*.pdf` files.
 
-**7. Internal Footprinting** 
-Metadata extracted from the unlocked PDFs exposed an internal staff note pointing toward legacy structures.
+**7. Directory Enumeration and Sensitive Endpoint Exposure** 
+Automated directory and endpoint enumeration tools (such as Gobuster) were deployed against the root domain to map hidden administrative paths, configuration files, and auxiliary directories.
 
 **8. Directory Indexing (`Vuln-06`)** 
 Investigation of the legacy endpoint revealed an exposed legacy backup folder with directory indexing enabled at `/old/`.
