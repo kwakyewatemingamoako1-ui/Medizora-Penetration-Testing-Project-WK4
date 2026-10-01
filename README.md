@@ -207,7 +207,7 @@ Confidential patient lab-report PDFs were downloaded directly from the portal in
 **6. Credential Weakness (`Vuln-04`)** 
 Wordlist attacks easily defeated the weak user passwords protecting these confidential `patient_report_*.pdf` files.
 
-**7. Internal Footprinting** 📝
+**7. Internal Footprinting** 
 Metadata extracted from the unlocked PDFs exposed an internal staff note pointing toward legacy structures.
 
 **8. Directory Indexing (`Vuln-06`)** 
